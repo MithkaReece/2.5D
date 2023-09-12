@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
 
 
     [SerializeField] private float _movementSpeed;
-    [SerializeField] private float _airMovementSpeed;
+   
 
 
 
@@ -118,7 +118,6 @@ public class Player : MonoBehaviour
                 return;
             case PlayerState.Jumping:
             case PlayerState.Falling:
-                HandleAirMovement();
                 _playerJumping.ManualUpdate();
                 return;
             case PlayerState.Sliding:
@@ -141,15 +140,7 @@ public class Player : MonoBehaviour
         HandleFacingDirection(movementVector);
     }
 
-    void HandleAirMovement() {
-        // Move player based on input
-        Vector3 movementVector = GameInput.GetMovementVector();
-        transform.position += movementVector * _airMovementSpeed * Time.deltaTime;
-
-        HandleFacingDirection(movementVector);
-    }
-
-    void HandleFacingDirection(Vector3 movementVector) {
+    public void HandleFacingDirection(Vector3 movementVector) {
         // Set facing direction
         if (movementVector.magnitude > FLOAT_ERROR)
             _facingDirection = movementVector;

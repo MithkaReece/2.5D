@@ -5,6 +5,7 @@ using static Player;
 public class PlayerJumping : MonoBehaviour
 {
     [SerializeField] private float _jumpSpeed = 2f;
+    [SerializeField] private float _airMovementSpeed;
 
     private float _gravity = 9.8f;
     private float _jumpVelocity = 0f;
@@ -17,6 +18,12 @@ public class PlayerJumping : MonoBehaviour
     private Player _player;
     [SerializeField] private PlayerAnimator _playerAnimator;
 
+    public Vector3 GetShadowPosition() {
+        if (_onGround) return transform.position;
+        return new Vector3(transform.position.x, _yJumpedFrom, transform.position.z);
+    }
+
+    public float GetHeight() { return _currentHeight; }
 
 
     private void Awake()
@@ -29,6 +36,12 @@ public class PlayerJumping : MonoBehaviour
         if (!GameInput.IsJumping() || _onGround == false) return;
         _player.SetState(PlayerState.Jumping);
         _currentReadyDuration = 0;
+    }
+
+    public void MoveInAir(Vector3 movementVector) {
+        Vector3 movementOffset = movementVector * _airMovementSpeed * Time.deltaTime;
+        transform.position += movementOffset;
+        _yJumpedFrom += movementOffset.y;
     }
 
 
@@ -44,11 +57,21 @@ public class PlayerJumping : MonoBehaviour
                 _jumpVelocity = _jumpSpeed;
                 _yJumpedFrom = transform.position.y;
                 _onGround = false;
-                Debug.Log("JUMP");
             }
         } else {
+            HandleAirMovement();
             HandleGravity();
         }
+    }
+
+    void HandleAirMovement() {
+        // Move player based on input
+        Vector3 movementVector = GameInput.GetMovementVector();
+
+        Vector3 movementOffset = movementVector * _airMovementSpeed * Time.deltaTime;
+        transform.position += movementOffset;
+        _yJumpedFrom += movementOffset.y;
+        _player.HandleFacingDirection(movementVector);
     }
 
     void HandleGravity() {
