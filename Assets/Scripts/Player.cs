@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class Player : MonoBehaviour
 {
@@ -9,9 +10,13 @@ public class Player : MonoBehaviour
 
     public event EventHandler OnTransition;
 
+    public PlayerState CurrentState { get; private set; }
+
     public enum PlayerState {
         Idle,
         Walking,
+        Jumping,
+        Falling,
         Sliding,
         StandingUp,
         Attacking
@@ -23,19 +28,27 @@ public class Player : MonoBehaviour
     [SerializeField] private List<PlayerState> _BeforeStandingUp;
     [SerializeField] private List<PlayerState> _BeforeAttacking;
 
-    public PlayerState CurrentState { get; private set; }
+    private Vector3 _facingDirection = Vector3.up;
 
     [SerializeField] private AnimationCurve _slideCurve;
     [SerializeField] private float _slideDistance;
     private Vector3 _beforeSlidePosition;
 
-    private Vector3 _facingDirection = Vector3.up;
-
 
     [SerializeField] private Animator _animator;
 
 
-    [SerializeField] private float _movementSpeed = 10f;
+    [SerializeField] private float _movementSpeed;
+    [SerializeField] private float _airMovementSpeed;
+
+
+
+    private PlayerJumping _playerJumping;
+
+    private void Awake()
+    {
+        _playerJumping = GetComponent<PlayerJumping>();
+    }
 
     /**
      * Inputs (Action check) -> Change State -> Run During State -> Run End State 
@@ -66,7 +79,6 @@ public class Player : MonoBehaviour
     private void GameInput_OnAttackAction(object sender, EventArgs e)
     {
         if (!IsValidState(_BeforeAttacking)) return;
-        Debug.Log("ATTACK");
         SetState(PlayerState.Attacking);
     }
 
@@ -99,14 +111,15 @@ public class Player : MonoBehaviour
         switch (CurrentState) {
             case PlayerState.Idle:
             case PlayerState.Walking:
-                // Move player based on input
-                Vector3 movementVector = GameInput.GetMovementVector();
-                transform.position += movementVector * _movementSpeed * Time.deltaTime;
-
-                if (movementVector.sqrMagnitude > FLOAT_ERROR) SetState(PlayerState.Walking);
-                else SetState(PlayerState.Idle);
-
-                HandleFacingDirection(movementVector);
+                HandleWalking();
+                _playerJumping.HandleJumping();
+                return;
+            case PlayerState.StandingUp:
+                return;
+            case PlayerState.Jumping:
+            case PlayerState.Falling:
+                HandleAirMovement();
+                _playerJumping.ManualUpdate();
                 return;
             case PlayerState.Sliding:
                 // Move player along slide curve
@@ -115,6 +128,25 @@ public class Player : MonoBehaviour
                 return;
         }
 
+    }
+
+    void HandleWalking() {
+        // Move player based on input
+        Vector3 movementVector = GameInput.GetMovementVector();
+        transform.position += movementVector * _movementSpeed * Time.deltaTime;
+
+        if (movementVector.sqrMagnitude > FLOAT_ERROR) SetState(PlayerState.Walking);
+        else SetState(PlayerState.Idle);
+
+        HandleFacingDirection(movementVector);
+    }
+
+    void HandleAirMovement() {
+        // Move player based on input
+        Vector3 movementVector = GameInput.GetMovementVector();
+        transform.position += movementVector * _airMovementSpeed * Time.deltaTime;
+
+        HandleFacingDirection(movementVector);
     }
 
     void HandleFacingDirection(Vector3 movementVector) {
@@ -130,6 +162,12 @@ public class Player : MonoBehaviour
     }
 
 
+
+    #endregion
+
+
+
+    #region End States
     void EndStates() {
         // When animation finishes
         if (_animationDeltaTime < _currentAnimationLength) return;
@@ -146,13 +184,16 @@ public class Player : MonoBehaviour
             case PlayerState.Attacking:
                 SetState(PlayerState.Idle);
                 return;
+            case PlayerState.Jumping:
+                SetState(PlayerState.Falling);
+                return;
         }
     }
     #endregion
 
 
 
-    void SetState(PlayerState newState) {
+    public void SetState(PlayerState newState) {
         if (newState == CurrentState) return;
         //If state changes, send out event, transition
         CurrentState = newState;

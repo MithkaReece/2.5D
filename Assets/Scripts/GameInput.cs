@@ -16,7 +16,8 @@ public class GameInput : MonoBehaviour
         Move_Left,
         Move_Down,
         Move_Right,
-        Move_Dodge,
+        Slide,
+        Jump,
         Attack,
         Attack_Alt,
         Pause,
@@ -50,6 +51,10 @@ public class GameInput : MonoBehaviour
 
     public static Vector3 GetMovementVector() {
         return playerInputActions.Player.Move.ReadValue<Vector2>();
+    }
+
+    public static bool IsJumping() {
+        return playerInputActions.Player.Jump.triggered;
     }
 
     private void OnDestroy()

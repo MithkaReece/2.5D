@@ -11,6 +11,10 @@ public class PlayerAnimator : MonoBehaviour
 
     [SerializeField] private float slideDuration;
     [SerializeField] private float standUpDuration;
+    [SerializeField] private float jumpDuration;
+    private float readyRatio = 12.0f / 41.0f;
+
+    public float GetReadyDuration() { return readyRatio * jumpDuration; }
 
     // Start is called before the first frame update
     void Start()
@@ -33,16 +37,13 @@ public class PlayerAnimator : MonoBehaviour
             case PlayerState.StandingUp:
                 _animator.speed = _animator.GetCurrentAnimatorStateInfo(0).length / standUpDuration;
                 break;
+            case PlayerState.Jumping:
+                _animator.speed = _animator.GetCurrentAnimatorStateInfo(0).length / jumpDuration;
+                break;
             default:
                 _animator.speed = 1.0f;
                 break;
         }        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private string StateToClipName(PlayerState state) {
@@ -51,6 +52,10 @@ public class PlayerAnimator : MonoBehaviour
                 return "idle";
             case PlayerState.Walking:
                 return "run";
+            case PlayerState.Jumping:
+                return "jump";
+            case PlayerState.Falling:
+                return "fall";
             case PlayerState.Sliding:
                 return "slide";
             case PlayerState.StandingUp:

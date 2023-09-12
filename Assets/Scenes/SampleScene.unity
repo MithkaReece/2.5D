@@ -152,6 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slideDuration: 1
   standUpDuration: 0.05
+  jumpDuration: 0.5
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -497,6 +498,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2098032743}
   - component: {fileID: 2098032742}
+  - component: {fileID: 2098032744}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -548,6 +550,7 @@ MonoBehaviour:
   _slideDistance: 3
   _animator: {fileID: 430235576}
   _movementSpeed: 10
+  _airMovementSpeed: 5
 --- !u!4 &2098032743
 Transform:
   m_ObjectHideFlags: 0
@@ -564,6 +567,20 @@ Transform:
   - {fileID: 430235575}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2098032744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2098032741}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dd7698bdddd3429981d140b10719988, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _jumpSpeed: 2
+  _playerAnimator: {fileID: 430235578}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
