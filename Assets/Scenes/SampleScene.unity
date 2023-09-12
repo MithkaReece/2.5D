@@ -516,7 +516,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51fea082777944fb9a16a84adc3c2dae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slideCurve:
+  _BeforeIdle: 
+  _BeforeWalking: 
+  _BeforeSliding: 0000000001000000
+  _BeforeStandingUp: 
+  _BeforeAttacking: 0000000001000000
+  _slideCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -540,10 +545,9 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  slideDistance: 5
-  SlideableStates: 0000000001000000
-  attackableStates: 0000000001000000
-  animator: {fileID: 430235576}
+  _slideDistance: 3
+  _animator: {fileID: 430235576}
+  _movementSpeed: 10
 --- !u!4 &2098032743
 Transform:
   m_ObjectHideFlags: 0

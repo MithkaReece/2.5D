@@ -6,8 +6,8 @@ using static Player;
 public class PlayerAnimator : MonoBehaviour
 {
 
-    private Animator animator;
-    private Player player;
+    private Animator _animator;
+    private Player _player;
 
     [SerializeField] private float slideDuration;
     [SerializeField] private float standUpDuration;
@@ -15,26 +15,26 @@ public class PlayerAnimator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        animator = GetComponent<Animator>();
-        player = transform.parent.GetComponent<Player>();
+        _animator = GetComponent<Animator>();
+        _player = GetComponentInParent<Player>();
 
-        player.OnTransition += Player_OnTransition;
+        _player.OnTransition += Player_OnTransition;
     }
 
     private void Player_OnTransition(object sender, System.EventArgs e)
     {
-        animator.Play(StateToClipName(player.CurrentState),0,0);
+        _animator.CrossFade(StateToClipName(_player.CurrentState),0,0);
 
-        switch (player.CurrentState) {
+        switch (_player.CurrentState) {
             case PlayerState.Sliding:
                 //Set duration of animation
-                animator.speed = animator.GetCurrentAnimatorStateInfo(0).length / slideDuration;
+                _animator.speed = _animator.GetCurrentAnimatorStateInfo(0).length / slideDuration;
                 break;
             case PlayerState.StandingUp:
-                animator.speed = animator.GetCurrentAnimatorStateInfo(0).length / standUpDuration;
+                _animator.speed = _animator.GetCurrentAnimatorStateInfo(0).length / standUpDuration;
                 break;
             default:
-                animator.speed = 1.0f;
+                _animator.speed = 1.0f;
                 break;
         }        
     }
