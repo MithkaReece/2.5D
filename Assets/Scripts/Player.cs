@@ -40,14 +40,16 @@ public class Player : MonoBehaviour
 
     [SerializeField] private float _movementSpeed;
    
-
+   
 
 
     private PlayerJumping _playerJumping;
+    private Rigidbody2D _rb;
 
     private void Awake()
     {
         _playerJumping = GetComponent<PlayerJumping>();
+        _rb = GetComponent<Rigidbody2D>();
     }
 
     /**
@@ -103,6 +105,10 @@ public class Player : MonoBehaviour
         EndStates();
         DuringStates();
         _animationDeltaTime += Time.deltaTime;
+
+        if (CalculateHeightMap.groundHeightMap.ContainsKey(Vector3Int.FloorToInt(transform.position))) {
+            int level = CalculateHeightMap.groundHeightMap[Vector3Int.FloorToInt(transform.position)];
+        }
     }
 
     #region During States
@@ -132,7 +138,7 @@ public class Player : MonoBehaviour
     void HandleWalking() {
         // Move player based on input
         Vector3 movementVector = GameInput.GetMovementVector();
-        transform.position += movementVector * _movementSpeed * Time.deltaTime;
+        _rb.MovePosition(transform.position + movementVector * _movementSpeed * Time.deltaTime);
 
         if (movementVector.sqrMagnitude > FLOAT_ERROR) SetState(PlayerState.Walking);
         else SetState(PlayerState.Idle);
